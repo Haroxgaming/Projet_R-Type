@@ -15,7 +15,7 @@ AEnnemyParent::AEnnemyParent()
 void AEnnemyParent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	death();
 }
 
 // Called every frame
@@ -23,5 +23,15 @@ void AEnnemyParent::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AEnnemyParent::death()
+{
+	if (PlayerRef)
+	{
+		PlayerRef->Score += score;
+	}
+	
+	K2_DestroyActor();
 }
 

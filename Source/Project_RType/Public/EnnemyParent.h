@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RType_Player.h"
 #include "EnnemyParent.generated.h"
 
 UCLASS()
@@ -22,5 +23,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere)
+	int score = 1;
+	
+	ARType_Player* PlayerRef;
+	
+	void death();
 
 };

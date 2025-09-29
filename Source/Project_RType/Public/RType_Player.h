@@ -15,6 +15,7 @@ public:
 	// Sets default values for this character's properties
 	ARType_Player();
 
+	int Score = 0;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
