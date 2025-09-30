@@ -26,9 +26,30 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int score = 1;
+
+	UPROPERTY(EditAnywhere)
+	int Health = 1;
+
+	UPROPERTY(EditAnywhere)
+	float FireRate = 3.0f;
+
+	UPROPERTY(EditAnywhere)
+	bool Aiming = false;
+
+	UPROPERTY(EditAnywhere)
+	bool IsMoving = false;
+
+	UPROPERTY(EditAnywhere)
+	float Speed = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float ProjectileSpeed = 100.0f;
+	
+	FTimerHandle FireRateTimer;
 	
 	ARType_Player* PlayerRef;
 	
-	void death();
+	void TakeHit();
+	void Fire();
 
 };

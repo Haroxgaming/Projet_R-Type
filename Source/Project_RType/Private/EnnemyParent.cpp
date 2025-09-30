@@ -15,7 +15,8 @@ AEnnemyParent::AEnnemyParent()
 void AEnnemyParent::BeginPlay()
 {
 	Super::BeginPlay();
-	death();
+
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimer, this, &AEnnemyParent::Fire, FireRate, true);
 }
 
 // Called every frame
@@ -25,13 +26,22 @@ void AEnnemyParent::Tick(float DeltaTime)
 
 }
 
-void AEnnemyParent::death()
+void AEnnemyParent::Fire()
 {
-	if (PlayerRef)
+     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
+}
+
+void AEnnemyParent::TakeHit()
+{
+	Health--;
+	if (Health <= 0)
 	{
-		PlayerRef->Score += score;
-	}
+		if (PlayerRef)
+		{
+			PlayerRef->Score += score;
+		}
 	
-	K2_DestroyActor();
+		K2_DestroyActor();
+	}
 }
 
