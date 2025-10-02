@@ -3,20 +3,32 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "GameFramework/Pawn.h"
 #include "RType_Player.generated.h"
 
+class UInputMappingContext;
+class UInputAction;
+struct FInputActionValue;
+
 UCLASS()
-class PROJECT_RTYPE_API ARType_Player : public ACharacter
+class PROJECT_RTYPE_API ARType_Player : public APawn
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* DefaultMappingContext;
+
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MoveAction;
+	
 public:
-	// Sets default values for this character's properties
+	// Sets default values for this pawn's properties
 	ARType_Player();
 
-	int Score = 0;
 protected:
+
+	void Move(const FInputActionValue& Value);
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

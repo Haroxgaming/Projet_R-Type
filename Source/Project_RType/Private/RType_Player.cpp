@@ -2,13 +2,23 @@
 
 
 #include "RType_Player.h"
+#include "GameFramework/Controller.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ARType_Player::ARType_Player()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+}
+
+void ARType_Player::Move(const FInputActionValue& Value)
+{
+	
 }
 
 // Called when the game starts or when spawned
