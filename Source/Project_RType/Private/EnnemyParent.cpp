@@ -38,7 +38,7 @@ void AEnnemyParent::TakeHit()
 	{
 		if (PlayerRef)
 		{
-			PlayerRef->Score += score;
+			//PlayerRef->Score += score;
 		}
 	
 		K2_DestroyActor();
