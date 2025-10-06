@@ -3,21 +3,29 @@
 
 #include "Projectile.h"
 
+#include "Components/PostProcessComponent.h"
+#include "Components/SphereComponent.h"
+
 // Sets default values
 AProjectile::AProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Ajout du ProjectileMovementComponent
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->SetUpdatedComponent(RootComponent); // Il doit savoir quel composant il déplace
+	ProjectileMovement->SetUpdatedComponent(RootComponent);
 
-	// Configuration par défaut
-	ProjectileMovement->InitialSpeed = 1500.f;
-	ProjectileMovement->MaxSpeed = 1500.f;
-	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = false;
+
+	ProjectileMovement->InitialSpeed = 200.0f;
+	ProjectileMovement->MaxSpeed = 200.0f;
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
+	
+	SphereCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("InteractCapsule"));
+	SphereCollision->SetupAttachment(GetRootComponent());
+	SphereCollision->InitCapsuleSize(50.f, 50.f);
+	
+	SphereCollision->SetGenerateOverlapEvents(true);
+	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_OverlapAll_Deprecated);
 }
 
 AProjectile::AProjectile(float ProjectileSpeed)
@@ -31,12 +39,25 @@ AProjectile::AProjectile(float ProjectileSpeed)
 
 	ProjectileMovement->InitialSpeed = ProjectileSpeed;
 	ProjectileMovement->MaxSpeed = ProjectileSpeed;
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
+	
+	SphereCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("InteractCapsule"));
+	SphereCollision->SetupAttachment(GetRootComponent());
+	SphereCollision->InitCapsuleSize(50.f, 50.f);
+	
+	SphereCollision->SetGenerateOverlapEvents(true);
+	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_OverlapAll_Deprecated);
+	
 }
 
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (SphereCollision)
+	{
+		SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnOverlapBegin);
+	}
 }
 
 // Called every frame
@@ -44,5 +65,13 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
+	IDamage::Execute_Hit(OtherActor, this);
+	Destroy();
 }
 

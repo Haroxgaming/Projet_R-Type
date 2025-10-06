@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Damage.h"
 #include "Projectile.generated.h"
 
 class UProjectileMovementComponent;
@@ -31,4 +33,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attachment")
+	UCapsuleComponent* SphereCollision;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 };

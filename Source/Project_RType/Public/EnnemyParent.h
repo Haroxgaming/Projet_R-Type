@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Damage.h"
 #include "GameFramework/Actor.h"
 #include "RType_Player.h"
 #include "EnnemyParent.generated.h"
 
 UCLASS()
-class PROJECT_RTYPE_API AEnnemyParent : public AActor
+class PROJECT_RTYPE_API AEnnemyParent : public AActor, public IDamage
 {
 	GENERATED_BODY()
 	
