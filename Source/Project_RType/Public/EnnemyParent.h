@@ -35,6 +35,12 @@ public:
 	float FireRate = 3.0f;
 
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AProjectile> ProjectileClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USceneComponent* ProjectileSpawnPoint;
+
+	UPROPERTY(EditAnywhere)
 	bool Aiming = false;
 
 	UPROPERTY(EditAnywhere)
@@ -47,10 +53,8 @@ public:
 	float ProjectileSpeed = 100.0f;
 	
 	FTimerHandle FireRateTimer;
-	
-	ARType_Player* PlayerRef;
-	
-	void TakeHit();
+
+	void Hit_Implementation(AActor* Caller) override;
 	void Fire();
 
 };

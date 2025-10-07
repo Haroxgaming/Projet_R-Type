@@ -9,6 +9,9 @@ AEnnemyParent::AEnnemyParent()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
+	ProjectileSpawnPoint->SetupAttachment(RootComponent);
+	ProjectileSpawnPoint->SetRelativeLocation(FVector(100.0f, 0.0f, 0.0f));
 }
 
 // Called when the game starts or when spawned
@@ -28,20 +31,36 @@ void AEnnemyParent::Tick(float DeltaTime)
 
 void AEnnemyParent::Fire()
 {
-     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
+	if (!ProjectileClass) return;
+
+	FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+	FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
+		ProjectileClass,
+		FTransform(SpawnRotation, SpawnLocation),
+		this,
+		GetInstigator(),
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+	);
+
+	if (Projectile)
+	{
+		Projectile->Initialize(ProjectileSpeed, this);
+
+		Projectile->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+	}
 }
 
-void AEnnemyParent::TakeHit()
+void AEnnemyParent::Hit_Implementation(AActor* Caller)
 {
 	Health--;
 	if (Health <= 0)
 	{
-		if (PlayerRef)
-		{
-			//PlayerRef->Score += score;
-		}
-	
 		K2_DestroyActor();
 	}
 }
-
