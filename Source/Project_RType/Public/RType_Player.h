@@ -14,7 +14,7 @@ class UInputAction;
 struct FInputActionValue;
 
 UCLASS()
-class PROJECT_RTYPE_API ARType_Player : public APawn
+class PROJECT_RTYPE_API ARType_Player : public APawn, public IDamage
 {
 	GENERATED_BODY()
 
@@ -48,6 +48,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Shooting")
 	TSubclassOf<AProjectile> ProjectileClass;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Shooting")
+	class USceneComponent* ProjectileSpawnPoint;
+	
+	UPROPERTY(EditAnywhere)
+	float ProjectileSpeed = 100.0f;
 protected:
 
 	void Move(const FInputActionValue& Value);
@@ -62,4 +67,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void OnMoveReleased(const FInputActionValue& Value);
+
+	void Hit(const FHitResult& Hit);
 };

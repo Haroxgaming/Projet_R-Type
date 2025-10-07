@@ -13,6 +13,9 @@ ARType_Player::ARType_Player()
     // Set this pawn to call Tick() every frame
     PrimaryActorTick.bCanEverTick = true;
 
+    ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
+    ProjectileSpawnPoint->SetupAttachment(RootComponent);
+    ProjectileSpawnPoint->SetRelativeLocation(FVector(100.0f, 0.0f, 0.0f));
 
     if (!RootComponent)
     {
@@ -67,25 +70,28 @@ void ARType_Player::Move(const FInputActionValue& Value)
 
 void ARType_Player::Shoot(const FInputActionValue& Value)
 {
-    if (ProjectileClass)
+    if (!ProjectileClass) return;
+
+    FVector SpawnLocation = GetActorLocation();
+    FRotator SpawnRotation = GetActorRotation();
+
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = GetInstigator();
+
+    AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
+        ProjectileClass,
+        FTransform(SpawnRotation, SpawnLocation),
+        this,
+        GetInstigator(),
+        ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+    );
+
+    if (Projectile)
     {
-        // Get spawn location & rotation from ArrowComponent
-        FVector SpawnLocation = ArrowComponent->GetComponentLocation();
-        FRotator SpawnRotation = ArrowComponent->GetComponentRotation();
+        Projectile->Initialize(ProjectileSpeed, this);
 
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.Owner = this;
-
-        GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
-        
-        
-
-        UE_LOG(LogTemp, Warning, TEXT("Player fired a projectile at location: %s, rotation: %s"),
-            *SpawnLocation.ToString(), *SpawnRotation.ToString());
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("ProjectileClass not set! Cannot shoot."));
+        Projectile->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
     }
 }
 
@@ -146,4 +152,9 @@ void ARType_Player::OnMoveReleased(const FInputActionValue& Value)
 {
     bIsMoving = false;
     CurrentMovementInput = FVector2D::ZeroVector;
+}
+
+void ARType_Player::Hit(const FHitResult& Hit)
+{
+    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hit"));
 }
