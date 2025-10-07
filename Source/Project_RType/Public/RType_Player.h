@@ -45,7 +45,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	UArrowComponent* ArrowComponent;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Shooting")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Shooting")
 	TSubclassOf<AProjectile> ProjectileClass;
 	
 protected:

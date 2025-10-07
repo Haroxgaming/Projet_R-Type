@@ -14,7 +14,10 @@ ARType_Player::ARType_Player()
     PrimaryActorTick.bCanEverTick = true;
 
 
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+    if (!RootComponent)
+    {
+        RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+    }
     
     FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("FloatingPawnMovement"));
 
@@ -74,6 +77,8 @@ void ARType_Player::Shoot(const FInputActionValue& Value)
         SpawnParams.Owner = this;
 
         GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParams);
+        
+        
 
         UE_LOG(LogTemp, Warning, TEXT("Player fired a projectile at location: %s, rotation: %s"),
             *SpawnLocation.ToString(), *SpawnRotation.ToString());
@@ -132,7 +137,7 @@ void ARType_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
         }
         if (ShootAction)
         {
-            EnhancedInput->BindAction(ShootAction, ETriggerEvent::Started, this, &ARType_Player::Shoot);
+            EnhancedInput->BindAction(ShootAction, ETriggerEvent::Triggered, this, &ARType_Player::Shoot);
         }
     }
 }
