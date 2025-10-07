@@ -21,7 +21,7 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
-	AProjectile(float ProjectileSpeed);
+	AProjectile(float ProjectileSpeed, AActor* launcher);
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,6 +37,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attachment")
 	UCapsuleComponent* SphereCollision;
 
+	UPROPERTY()
+	AActor* Self;
+	
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 

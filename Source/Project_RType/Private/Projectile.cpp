@@ -28,10 +28,11 @@ AProjectile::AProjectile()
 	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_OverlapAll_Deprecated);
 }
 
-AProjectile::AProjectile(float ProjectileSpeed)
+AProjectile::AProjectile(float ProjectileSpeed, AActor* launcher)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	Self = launcher;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->SetUpdatedComponent(RootComponent);
@@ -44,10 +45,7 @@ AProjectile::AProjectile(float ProjectileSpeed)
 	SphereCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("InteractCapsule"));
 	SphereCollision->SetupAttachment(GetRootComponent());
 	SphereCollision->InitCapsuleSize(50.f, 50.f);
-	
 	SphereCollision->SetGenerateOverlapEvents(true);
-	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_OverlapAll_Deprecated);
 	
 }
 
@@ -70,8 +68,12 @@ void AProjectile::Tick(float DeltaTime)
 void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
-	IDamage::Execute_Hit(OtherActor, this);
-	Destroy();
+	
+	if (OtherActor != Self && !OtherActor->IsA(AProjectile::StaticClass()) )
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
+		//IDamage::Execute_Hit(OtherActor, this);
+		Destroy();
+	}
 }
 
