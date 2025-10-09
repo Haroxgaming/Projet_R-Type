@@ -50,13 +50,34 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Shooting")
 	class USceneComponent* ProjectileSpawnPoint;
+
+	FTimerHandle FireRateTimer;
+
+	UPROPERTY(EditAnywhere)
+	float FireRate = 0.5f;
+
+	UPROPERTY(EditAnywhere)
+	bool CanShoot = true;
+
+	FTimerHandle InvinciblityTimer;
+
+	UPROPERTY(EditAnywhere)
+	float InvincibilityTime = 3.0f;
 	
 	UPROPERTY(EditAnywhere)
-	float ProjectileSpeed = 100.0f;
+	bool Invincible = false;
+
+	UPROPERTY(EditAnywhere)
+	int Health = 3;
+	
+	UPROPERTY(EditAnywhere)
+	float ProjectileSpeed = 1500.0f;
 protected:
 
 	void Move(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
+	void Reload();
+	void InvincibleEnd();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -68,5 +89,5 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void OnMoveReleased(const FInputActionValue& Value);
 
-	void Hit(const FHitResult& Hit);
+	void Hit_Implementation(AActor* Caller);
 };

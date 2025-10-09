@@ -10,8 +10,6 @@ AEnnemyParent::AEnnemyParent()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
-	ProjectileSpawnPoint->SetupAttachment(RootComponent);
-	ProjectileSpawnPoint->SetRelativeLocation(FVector(100.0f, 0.0f, 0.0f));
 }
 
 // Called when the game starts or when spawned
@@ -50,7 +48,7 @@ void AEnnemyParent::Fire()
 
 	if (Projectile)
 	{
-		Projectile->Initialize(ProjectileSpeed, this);
+		Projectile->Initialize(ProjectileSpeed, false);
 
 		Projectile->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
 	}

@@ -3,6 +3,8 @@
 
 #include "Projectile.h"
 
+#include "EnnemyParent.h"
+#include "RType_Player.h"
 #include "Components/PostProcessComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -45,30 +47,36 @@ void AProjectile::Tick(float DeltaTime)
 
 }
 
-void AProjectile::Initialize(float ProjectileSpeed, AActor* Launcher)
+void AProjectile::Initialize(float ProjectileSpeed, bool IsPlayer)
 {
     if (ProjectileMovement)
     {
         ProjectileMovement->InitialSpeed = ProjectileSpeed;
         ProjectileMovement->MaxSpeed = ProjectileSpeed;
     }
-
-    if (Launcher && SphereCollision)
-    {
-        SphereCollision->IgnoreActorWhenMoving(Launcher, true);
-    }
+	PlayerShoot = IsPlayer;
 }
 
 void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
-	if (!OtherActor->IsA(AProjectile::StaticClass()) )
+	if (PlayerShoot)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hit"));
-		IDamage::Execute_Hit(OtherActor, this);
-		Destroy();
+		if (!OtherActor->IsA(AProjectile::StaticClass()) && !OtherActor->IsA(ARType_Player::StaticClass()))
+		{
+			IDamage::Execute_Hit(OtherActor, this);
+			Destroy();
+		}
 	}
+	else
+	{
+		if (!OtherActor->IsA(AProjectile::StaticClass()) && !OtherActor->IsA(AEnnemyParent::StaticClass()))
+		{
+			IDamage::Execute_Hit(OtherActor, this);
+			Destroy();
+		}
+	}
+	
 }
 
 void AProjectile::SelfDestroy()

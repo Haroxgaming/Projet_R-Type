@@ -35,10 +35,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attachment")
 	UCapsuleComponent* SphereCollision;
 
-	void Initialize(float ProjectileSpeed, AActor* Launcher);
+	void Initialize(float ProjectileSpeed, bool IsPlayer);
 	
 	UPROPERTY()
-	AActor* Self;
+	bool PlayerShoot;
 	
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

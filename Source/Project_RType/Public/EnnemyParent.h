@@ -26,16 +26,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere)
-	int score = 1;
-
-	UPROPERTY(EditAnywhere)
 	int Health = 1;
 
 	UPROPERTY(EditAnywhere)
 	float FireRate = 3.0f;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AProjectile> ProjectileClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AProjectile> ProjectileClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class USceneComponent* ProjectileSpawnPoint;

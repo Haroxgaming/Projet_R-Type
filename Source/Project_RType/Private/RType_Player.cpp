@@ -70,29 +70,45 @@ void ARType_Player::Move(const FInputActionValue& Value)
 
 void ARType_Player::Shoot(const FInputActionValue& Value)
 {
-    if (!ProjectileClass) return;
-
-    FVector SpawnLocation = GetActorLocation();
-    FRotator SpawnRotation = GetActorRotation();
-
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = this;
-    SpawnParams.Instigator = GetInstigator();
-
-    AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
-        ProjectileClass,
-        FTransform(SpawnRotation, SpawnLocation),
-        this,
-        GetInstigator(),
-        ESpawnActorCollisionHandlingMethod::AlwaysSpawn
-    );
-
-    if (Projectile)
+    if (CanShoot)
     {
-        Projectile->Initialize(ProjectileSpeed, this);
+        if (!ProjectileClass) return;
 
-        Projectile->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+        FVector SpawnLocation = GetActorLocation() + (GetActorForwardVector() * 100.0f);
+        FRotator SpawnRotation = GetActorRotation();
+
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.Instigator = GetInstigator();
+
+        AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
+            ProjectileClass,
+            FTransform(SpawnRotation, SpawnLocation),
+            this,
+            GetInstigator(),
+            ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+        );
+
+        if (Projectile)
+        {
+            Projectile->Initialize(ProjectileSpeed, true);
+
+            Projectile->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+        }
+        GetWorld()->GetTimerManager().SetTimer(FireRateTimer, this, &ARType_Player::Reload, FireRate, false);
+        CanShoot = false;
     }
+
+}
+
+void ARType_Player::Reload()
+{
+    CanShoot= true;
+}
+
+void ARType_Player::InvincibleEnd()
+{
+    Invincible = false;
 }
 
 // Called when the game starts or when spawned
@@ -154,7 +170,19 @@ void ARType_Player::OnMoveReleased(const FInputActionValue& Value)
     CurrentMovementInput = FVector2D::ZeroVector;
 }
 
-void ARType_Player::Hit(const FHitResult& Hit)
+void ARType_Player::Hit_Implementation(AActor* Caller)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hit"));
+    if (!Invincible)
+    {
+        Health--;
+        if (Health <= 0)
+        {
+            Destroy();
+        }
+        else
+        {
+            Invincible = true;
+            GetWorld()->GetTimerManager().SetTimer(InvinciblityTimer, this, &ARType_Player::InvincibleEnd, InvincibilityTime, false);
+        }
+    }
 }
