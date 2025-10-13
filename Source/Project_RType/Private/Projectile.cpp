@@ -62,7 +62,7 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 {
 	if (PlayerShoot)
 	{
-		if (!OtherActor->IsA(AProjectile::StaticClass()) && !OtherActor->IsA(ARType_Player::StaticClass()))
+		if (!OtherActor->IsA(AProjectile::StaticClass()) && !OtherActor->IsA(ARType_Player::StaticClass())&& OtherActor->GetClass()->ImplementsInterface(UDamage::StaticClass()))
 		{
 			IDamage::Execute_Hit(OtherActor, this);
 			Destroy();
@@ -70,7 +70,7 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	}
 	else
 	{
-		if (!OtherActor->IsA(AProjectile::StaticClass()) && !OtherActor->IsA(AEnnemyParent::StaticClass()))
+		if (!OtherActor->IsA(AProjectile::StaticClass()) && !OtherActor->IsA(AEnnemyParent::StaticClass()) && OtherActor->GetClass()->ImplementsInterface(UDamage::StaticClass()))
 		{
 			IDamage::Execute_Hit(OtherActor, this);
 			Destroy();
