@@ -54,7 +54,7 @@ public:
 	FTimerHandle FireRateTimer;
 
 	UPROPERTY(EditAnywhere)
-	float FireRate = 0.5f;
+	float FireRate = 0.4f;
 
 	UPROPERTY(EditAnywhere)
 	bool CanShoot = true;

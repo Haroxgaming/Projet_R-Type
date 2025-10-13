@@ -26,6 +26,8 @@ ARType_Player::ARType_Player()
 
     ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
     ShipMesh->SetupAttachment(RootComponent);
+    ShipMesh->SetRelativeRotation(FRotator(-90.0f, 0.0f, 90.0f));
+    ShipMesh->SetRelativeScale3D(FVector(25.0f, 25.0f, 25.0f));
 
     ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
     ArrowComponent->SetupAttachment(RootComponent);
