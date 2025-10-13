@@ -2,11 +2,8 @@
 
 
 #include "Projectile.h"
-
 #include "EnnemyParent.h"
 #include "RType_Player.h"
-#include "Components/PostProcessComponent.h"
-#include "Components/SphereComponent.h"
 
 // Sets default values
 AProjectile::AProjectile()
@@ -67,12 +64,20 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 			IDamage::Execute_Hit(OtherActor, this);
 			Destroy();
 		}
+		else
+		{
+			Destroy();
+		}
 	}
 	else
 	{
 		if (!OtherActor->IsA(AProjectile::StaticClass()) && !OtherActor->IsA(AEnnemyParent::StaticClass()) && OtherActor->GetClass()->ImplementsInterface(UDamage::StaticClass()))
 		{
 			IDamage::Execute_Hit(OtherActor, this);
+			Destroy();
+		}
+		else
+		{
 			Destroy();
 		}
 	}
