@@ -6,6 +6,7 @@
 #include "Components/ArrowComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Projectile.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "RType_Player.generated.h"
 
@@ -43,6 +44,18 @@ public:
 	UStaticMeshComponent* ShipMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* Shield;
+
+	UFUNCTION(BlueprintCallable, Category="Shield")
+	void SetShieldMaterial(UMaterialInterface* NewMaterial)
+	{
+		if (Shield)
+		{
+			Shield->SetMaterial(0, NewMaterial);
+		}
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	UArrowComponent* ArrowComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Shooting")
@@ -50,6 +63,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Shooting")
 	class USceneComponent* ProjectileSpawnPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UBoxComponent* CollisionBox;
 
 	FTimerHandle FireRateTimer;
 
@@ -61,17 +77,25 @@ public:
 
 	FTimerHandle InvinciblityTimer;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stat")
 	float InvincibilityTime = 3.0f;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stat")
 	bool Invincible = false;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stat")
 	int Health = 3;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stat")
+	float ProjectileSpeed = 2000.0f;
+
 	UPROPERTY(EditAnywhere)
-	float ProjectileSpeed = 1500.0f;
+	FRotator BaseShipRotation = FRotator(0.f, 0.f, 0.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stat")
+	float MoveSpeed = 1000.f;
+
+	
 protected:
 
 	void Move(const FInputActionValue& Value);

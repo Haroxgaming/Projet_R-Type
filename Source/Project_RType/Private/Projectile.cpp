@@ -8,23 +8,24 @@
 // Sets default values
 AProjectile::AProjectile()
 {
-	PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = true;
 
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->SetUpdatedComponent(RootComponent);
+    ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+    ProjectileMovement->SetUpdatedComponent(RootComponent);
 
+    ProjectileMovement->InitialSpeed = 200.0f;
+    ProjectileMovement->MaxSpeed = 200.0f;
+    ProjectileMovement->ProjectileGravityScale = 0.0f;
+    
+    SphereCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("InteractCapsule"));
+    SphereCollision->SetupAttachment(GetRootComponent());
+    SphereCollision->InitCapsuleSize(50.f, 50.f);
 
-	ProjectileMovement->InitialSpeed = 200.0f;
-	ProjectileMovement->MaxSpeed = 200.0f;
-	ProjectileMovement->ProjectileGravityScale = 0.0f;
-	
-	SphereCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("InteractCapsule"));
-	SphereCollision->SetupAttachment(GetRootComponent());
-	SphereCollision->InitCapsuleSize(50.f, 50.f);
-	
-	SphereCollision->SetGenerateOverlapEvents(true);
-	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_OverlapAll_Deprecated);
+    SphereCollision->SetGenerateOverlapEvents(true);
+    SphereCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+    SphereCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
+    SphereCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+    SphereCollision->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 }
 
 void AProjectile::BeginPlay()
@@ -64,9 +65,13 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 			IDamage::Execute_Hit(OtherActor, this);
 			Destroy();
 		}
-		else
+		if(!OtherActor->IsA(ARType_Player::StaticClass()) && !OtherActor->IsA(AProjectile::StaticClass()))
 		{
 			Destroy();
+		}
+		else
+		{
+			
 		}
 	}
 	else
@@ -76,9 +81,13 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 			IDamage::Execute_Hit(OtherActor, this);
 			Destroy();
 		}
-		else
+		if (!OtherActor->IsA(AEnnemyParent::StaticClass())&& !OtherActor->IsA(AProjectile::StaticClass()))
 		{
 			Destroy();
+		}
+		else
+		{
+			
 		}
 	}
 	

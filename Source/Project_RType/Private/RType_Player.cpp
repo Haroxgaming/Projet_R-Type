@@ -1,7 +1,7 @@
 
 #include "RType_Player.h"
 #include "GameFramework/Controller.h"
-#include "EnhancedInputComponent.h"
+#include "EnhancedInputComponent.h" 
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
@@ -10,25 +10,32 @@
 // Sets default values
 ARType_Player::ARType_Player()
 {
-    // Set this pawn to call Tick() every frame
     PrimaryActorTick.bCanEverTick = true;
+
+    // 1. CREATE AND SET THE BOX AS ROOT
+    CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
+    RootComponent = CollisionBox;
+
+    CollisionBox->SetBoxExtent(FVector(50.f, 20.f, 20.f)); // Adapte la taille
+    CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    CollisionBox->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+    CollisionBox->SetCollisionResponseToAllChannels(ECR_Block);
+    CollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // Optionnel: Block si tu veux bloquer d'autres pawns
+
+    // 2. Attache le mesh et les autres composants
+    ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
+    ShipMesh->SetupAttachment(RootComponent);
+
+    Shield = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Shield"));
+    Shield->SetupAttachment(RootComponent);
+
+    ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
+    ArrowComponent->SetupAttachment(RootComponent);
 
     ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
     ProjectileSpawnPoint->SetupAttachment(RootComponent);
     ProjectileSpawnPoint->SetRelativeLocation(FVector(100.0f, 0.0f, 0.0f));
-
-    if (!RootComponent)
-    {
-        RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-    }
     
-    FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("FloatingPawnMovement"));
-
-    ShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
-    ShipMesh->SetupAttachment(RootComponent);
-
-    ArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
-    ArrowComponent->SetupAttachment(RootComponent);
 }
 
 void ARType_Player::Move(const FInputActionValue& Value)
@@ -40,17 +47,33 @@ void ARType_Player::Move(const FInputActionValue& Value)
     {
         bIsMoving = true;
 
-        // Move right/left (X)
-        AddMovementInput(GetActorForwardVector(), CurrentMovementInput.X);
+        
+        FVector MoveDirection = (GetActorForwardVector() * CurrentMovementInput.X) + (GetActorUpVector() * CurrentMovementInput.Y);
+        if (!MoveDirection.IsNearlyZero())
+        {
+            FVector MoveDelta = MoveDirection.GetSafeNormal() * MoveSpeed * GetWorld()->GetDeltaSeconds();
+            FHitResult Hit;
+            AddActorWorldOffset(MoveDelta, true, &Hit);
+            if (Hit.bBlockingHit)
+            {
+                if (Hit.GetActor())
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("BLOQUÉ PAR: %s"), *GetNameSafe(Hit.GetActor()));
+                }
 
-        // Move forward/backward (Y)
-        AddMovementInput(GetActorUpVector(), CurrentMovementInput.Y);
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("BLOQUÉ PAR: None. BlockingComponent: %s"), *GetNameSafe(Hit.Component.Get()));
+                }
+                
+            }
+        }
 
-        const float MaxRoll  = 25.0f; // tilt forward/backward
+        const float MaxYaw  = 35.0f; // tilt forward/backward
         const float MaxPitch = -15.0f; // tilt left/right only when moving backward
-
+    
         // Roll depends on Y input
-        float TargetRoll = -CurrentMovementInput.Y * MaxRoll;
+        float TargetYaw = -CurrentMovementInput.Y * MaxYaw;
 
         // Pitch only when moving backward
         float TargetPitch = 0.0f;
@@ -60,7 +83,7 @@ void ARType_Player::Move(const FInputActionValue& Value)
         }
 
         FRotator CurrentRotation = ShipMesh->GetRelativeRotation();
-        FRotator TargetRotation  = FRotator(TargetPitch, 0.f, TargetRoll);
+        FRotator TargetRotation = BaseShipRotation + FRotator(TargetYaw, 0.f, TargetPitch);
 
         FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), 5.0f);
 
@@ -109,12 +132,15 @@ void ARType_Player::Reload()
 void ARType_Player::InvincibleEnd()
 {
     Invincible = false;
+    Shield->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
 void ARType_Player::BeginPlay()
 {
     Super::BeginPlay();
+    
+    BaseShipRotation = ShipMesh->GetRelativeRotation();
 
     // Add Input Mapping Context for Enhanced Input
     if (APlayerController* PC = Cast<APlayerController>(Controller))
@@ -137,10 +163,8 @@ void ARType_Player::Tick(float DeltaTime)
 
     if (!bIsMoving)
     {
-        FRotator TargetRotation = FRotator::ZeroRotator;
         FRotator CurrentRotation = ShipMesh->GetRelativeRotation();
-
-        FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 5.0f);
+        FRotator NewRotation = FMath::RInterpTo(CurrentRotation, BaseShipRotation, DeltaTime, 5.0f);
         ShipMesh->SetRelativeRotation(NewRotation);
     }
 }
@@ -177,10 +201,10 @@ void ARType_Player::Hit_Implementation(AActor* Caller)
         Health--;
         if (Health <= 0)
         {
-            Destroy();
         }
         else
         {
+            Shield->SetVisibility(true);
             Invincible = true;
             GetWorld()->GetTimerManager().SetTimer(InvinciblityTimer, this, &ARType_Player::InvincibleEnd, InvincibilityTime, false);
         }
