@@ -3,9 +3,11 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h" 
 #include "EnhancedInputSubsystems.h"
+#include "GameCamera.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ARType_Player::ARType_Player()
@@ -141,6 +143,7 @@ void ARType_Player::BeginPlay()
     Super::BeginPlay();
     
     BaseShipRotation = ShipMesh->GetRelativeRotation();
+    CameraActorReference = Cast<AGameCamera>(UGameplayStatics::GetActorOfClass(GetWorld(), AGameCamera::StaticClass()));
 
     // Add Input Mapping Context for Enhanced Input
     if (APlayerController* PC = Cast<APlayerController>(Controller))
@@ -166,6 +169,25 @@ void ARType_Player::Tick(float DeltaTime)
         FRotator CurrentRotation = ShipMesh->GetRelativeRotation();
         FRotator NewRotation = FMath::RInterpTo(CurrentRotation, BaseShipRotation, DeltaTime, 5.0f);
         ShipMesh->SetRelativeRotation(NewRotation);
+    }
+    
+    if (CameraActorReference)
+    {
+        FVector PlayerLocation = GetActorLocation();
+        FVector CameraLocation = CameraActorReference->GetActorLocation();
+        const float HorizontalBounds = 2000.0f;
+        const float VerticalBounds = 1050.0f;
+
+        float LimitLeft = CameraLocation.Y - HorizontalBounds;
+        float LimitRight = CameraLocation.Y + HorizontalBounds;
+        float LimitBottom = CameraLocation.Z - VerticalBounds;
+        float LimitTop = CameraLocation.Z + VerticalBounds;
+
+        FVector ClampedLocation = PlayerLocation;
+        ClampedLocation.Y = FMath::Clamp(PlayerLocation.Y, LimitLeft, LimitRight);
+        ClampedLocation.Z = FMath::Clamp(PlayerLocation.Z, LimitBottom, LimitTop);
+
+        SetActorLocation(ClampedLocation);
     }
 }
 

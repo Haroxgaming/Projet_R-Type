@@ -34,6 +34,9 @@ class PROJECT_RTYPE_API ARType_Player : public APawn, public IDamage
 
 	FVector2D CurrentMovementInput;
 
+	UPROPERTY()
+	class AGameCamera* CameraActorReference;
+
 	bool bIsMoving = false;
 
 public:
