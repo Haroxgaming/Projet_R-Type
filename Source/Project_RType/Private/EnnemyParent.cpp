@@ -50,6 +50,11 @@ void AEnnemyParent::Fire()
 	{
 		Projectile->Initialize(ProjectileSpeed, false);
 
+		if (Aiming && PlayerPawn)
+		{
+			FVector Direction = (PlayerPawn->GetActorLocation() - SpawnLocation);
+			SpawnRotation = Direction.Rotation();
+		}
 		Projectile->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
 	}
 }

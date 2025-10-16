@@ -47,6 +47,9 @@ public:
 	float Speed = 0.0f;
 
 	UPROPERTY(EditAnywhere)
+	ARType_Player* PlayerPawn;
+
+	UPROPERTY(EditAnywhere)
 	float ProjectileSpeed = 100.0f;
 	
 	FTimerHandle FireRateTimer;
