@@ -41,9 +41,6 @@ public:
 	bool Aiming = false;
 
 	UPROPERTY(EditAnywhere)
-	bool IsMoving = false;
-
-	UPROPERTY(EditAnywhere)
 	float Speed = 0.0f;
 
 	UPROPERTY(EditAnywhere)
