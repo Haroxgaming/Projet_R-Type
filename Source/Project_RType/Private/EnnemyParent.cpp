@@ -3,6 +3,8 @@
 
 #include "EnnemyParent.h"
 
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AEnnemyParent::AEnnemyParent()
 {
@@ -56,6 +58,10 @@ void AEnnemyParent::Fire()
 			SpawnRotation = Direction.Rotation();
 		}
 		Projectile->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+	}
+	if (ShootSound)
+	{
+		UGameplayStatics::PlaySound2D(this, ShootSound);
 	}
 }
 

@@ -98,6 +98,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stat")
 	float MoveSpeed = 1200.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundBase* ShootSound;
 	
 protected:
 

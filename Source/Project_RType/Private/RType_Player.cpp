@@ -122,8 +122,12 @@ void ARType_Player::Shoot(const FInputActionValue& Value)
         }
         GetWorld()->GetTimerManager().SetTimer(FireRateTimer, this, &ARType_Player::Reload, FireRate, false);
         CanShoot = false;
-    }
 
+        if (ShootSound)
+        {
+            UGameplayStatics::PlaySound2D(this, ShootSound);
+        }
+    }
 }
 
 void ARType_Player::Reload()

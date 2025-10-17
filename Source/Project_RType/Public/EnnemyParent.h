@@ -48,6 +48,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float ProjectileSpeed = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundBase* ShootSound;
 	
 	FTimerHandle FireRateTimer;
 
