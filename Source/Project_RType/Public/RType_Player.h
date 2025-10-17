@@ -96,7 +96,7 @@ public:
 	FRotator BaseShipRotation = FRotator(0.f, 0.f, 0.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Stat")
-	float MoveSpeed = 1000.f;
+	float MoveSpeed = 1200.f;
 
 	
 protected:
