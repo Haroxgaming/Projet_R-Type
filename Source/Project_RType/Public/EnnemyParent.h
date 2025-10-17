@@ -35,7 +35,7 @@ public:
 	TSubclassOf<AProjectile> ProjectileClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class USceneComponent* ProjectileSpawnPoint;
+	class USceneComponent* ProjectileSpawnPoint; 
 
 	UPROPERTY(EditAnywhere)
 	bool Aiming = false;
