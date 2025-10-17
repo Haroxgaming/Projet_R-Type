@@ -223,6 +223,7 @@ void ARType_Player::Hit_Implementation(AActor* Caller)
         Health--;
         if (Health <= 0)
         {
+            UGameplayStatics::OpenLevelBySoftObjectPtr(this, GetWorld());
         }
         else
         {
